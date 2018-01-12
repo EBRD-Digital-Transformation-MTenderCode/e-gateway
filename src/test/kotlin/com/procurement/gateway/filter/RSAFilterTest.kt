@@ -7,7 +7,7 @@ import com.auth0.jwt.exceptions.SignatureVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.http.HttpServletRequestWrapper
-import com.procurement.gateway.configuration.properties.ProxyProperties
+import com.procurement.gateway.configuration.properties.RSAFilterProperties
 import com.procurement.gateway.exception.InvalidAuthorizationHeaderTypeException
 import com.procurement.gateway.exception.NoSuchAuthorizationHeaderException
 import com.procurement.gateway.security.*
@@ -36,7 +36,7 @@ class RSAFilterTest {
         const val EXPIRED_TOKEN_MSG = "$REALM, error_code=\"invalid_token\", error_message=\"The access token expired.\""
     }
 
-    private val proxyProperties = ProxyProperties()
+    private val proxyProperties = RSAFilterProperties()
     private val rsaService: RSAService = RSAServiceImpl(KeyFactoryServiceImpl())
     private val rsaPublicKey = rsaService.toPublicKey(RSA_KEY_PAIR.publicKey)
     private val rsaPrivateKey = rsaService.toPrivateKey(RSA_KEY_PAIR.privateKey)

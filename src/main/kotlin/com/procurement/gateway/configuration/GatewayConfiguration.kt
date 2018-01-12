@@ -1,6 +1,6 @@
 package com.procurement.gateway.configuration
 
-import com.procurement.gateway.configuration.properties.ProxyProperties
+import com.procurement.gateway.configuration.properties.RSAFilterProperties
 import com.procurement.gateway.filter.RSAFilter
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -15,11 +15,11 @@ import org.springframework.context.annotation.Import
 )
 @EnableConfigurationProperties(
     value = [
-        ProxyProperties::class
+        RSAFilterProperties::class
     ]
 )
-class GatewayConfiguration(private val proxyProperties: ProxyProperties,
+class GatewayConfiguration(private val RSAFilterProperties: RSAFilterProperties,
                            private val securityConfiguration: SecurityConfiguration) {
     @Bean
-    fun rsaFilter() = RSAFilter(proxyProperties, securityConfiguration.jwtService())
+    fun rsaFilter() = RSAFilter(RSAFilterProperties, securityConfiguration.jwtService())
 }

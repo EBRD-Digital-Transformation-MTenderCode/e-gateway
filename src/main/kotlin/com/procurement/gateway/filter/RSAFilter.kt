@@ -6,7 +6,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.http.HttpServletRequestWrapper
-import com.procurement.gateway.configuration.properties.ProxyProperties
+import com.procurement.gateway.configuration.properties.RSAFilterProperties
 import com.procurement.gateway.exception.InvalidAuthorizationHeaderTypeException
 import com.procurement.gateway.exception.NoSuchAuthorizationHeaderException
 import com.procurement.gateway.security.JWTService
@@ -16,7 +16,7 @@ import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PR
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE
 import org.springframework.http.HttpStatus
 
-class RSAFilter(private val proxyProperties: ProxyProperties, private val jwtService: JWTService) : ZuulFilter() {
+class RSAFilter(private val RSAFilterProperties: RSAFilterProperties, private val jwtService: JWTService) : ZuulFilter() {
     companion object {
         const val AUTHORIZATION_HEADER = "Authorization"
         const val AUTHORIZATION_PREFIX_BEARER = "Bearer "
@@ -33,7 +33,7 @@ class RSAFilter(private val proxyProperties: ProxyProperties, private val jwtSer
     override fun shouldFilter(): Boolean {
         val context = RequestContext.getCurrentContext()
         val proxy = context["proxy"]
-        return !(proxy == null || proxyProperties.exclude.contains(proxy))
+        return !(proxy == null || RSAFilterProperties.exclude.contains(proxy))
     }
 
     override fun run(): Any? {

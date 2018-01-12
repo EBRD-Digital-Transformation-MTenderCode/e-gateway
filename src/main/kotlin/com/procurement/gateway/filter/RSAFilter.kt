@@ -28,7 +28,7 @@ class RSAFilter(private val RSAFilterProperties: RSAFilterProperties, private va
 
     override fun filterType(): String = PRE_TYPE
 
-    override fun filterOrder(): Int = PRE_DECORATION_FILTER_ORDER - 1
+    override fun filterOrder(): Int = PRE_DECORATION_FILTER_ORDER + 1
 
     override fun shouldFilter(): Boolean {
         val context = RequestContext.getCurrentContext()

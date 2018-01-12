@@ -1,3 +1,9 @@
+spring:
+  cloud:
+    inetutils:
+      preferredNetworks:
+        - 192.168
+
 zuul:
   filters:
     exclude:

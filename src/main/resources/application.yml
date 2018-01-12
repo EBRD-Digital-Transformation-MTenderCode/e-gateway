@@ -32,7 +32,10 @@ eureka:
 jwt:
   public-key: |
              -----BEGIN PUBLIC KEY-----
-
+             MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs6Ak7AGVxsmjZeRhlTjpThN56QgWNRsCxGtKEw0tj8Bx30xr1a46xpcE91sh41
+             Tr9MPXFh/YwUq0wEprv3skCiRAD+Lbo68NReCvhYjbYn6hdiR5QBOlysEF0cO7GTiXgbY2JGkqcj+VlITp8cGiW6PkLIVzEjQXRkFfTToY
+             upBKz4Lf7LtAGi+B50mX196yUHTirm6PKKJLcIuooqOHp39ecvaqHwWMloVH0sjTpZh7hvCRpARdxUQ/8KAB8tiFoMsCJPEr/Alr6P64B0
+             6oX0VzT68u5lyNQL6h5YaGxUuRwhFuKcvEt3wavHNoHn2FmyJjrhlcRLjyi3jiz/0WjQIDAQAB
              -----END PUBLIC KEY-----
 
 

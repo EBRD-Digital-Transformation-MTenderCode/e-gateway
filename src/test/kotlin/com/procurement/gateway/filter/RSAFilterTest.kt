@@ -50,7 +50,7 @@ class RSAFilterTest {
 
     @Test
     fun filterOrder() {
-        assertEquals(rsaFilter.filterOrder(), FilterConstants.PRE_DECORATION_FILTER_ORDER - 1)
+        assertEquals(rsaFilter.filterOrder(), FilterConstants.PRE_DECORATION_FILTER_ORDER + 1)
     }
 
     @Test

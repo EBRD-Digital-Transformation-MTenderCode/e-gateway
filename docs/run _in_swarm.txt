@@ -18,6 +18,7 @@ docker service create --name="gateway-1" \
 --env __PROP_spring_cloud_config_uri=http://config-server-1:8700 \
 --env __PROP_spring_profiles_active=default \
 --env __PROP_spring_cloud_config_label= \
+--publish published=8900,target=8080 \
 --with-registry-auth \
 --network my-network \
 docker-registry.eprocurement.systems/e-gateway:17.12.1

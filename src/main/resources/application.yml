@@ -5,22 +5,36 @@ spring:
         - 192.168
 
 zuul:
-  filters:
+  rsa-filter:
     exclude:
-    - hello
+    - e-auth-tokens
 
   sensitiveHeaders:
 #  sensitive-headers: Cookie,Set-Cookie,Authorization
 #  ignore-security-headers: false
-#  prefix: /api
+  prefix: /api/v1
   ignoredServices: '*'
 
   routes:
-    hello:
-      path: /hello/**
+    e-auth-tokens:
+      path: /auth/tokens
+      serviceId: e-auth
+      stripPrefix: false
+    e-auth-refresh:
+      path: /auth/refresh
+      serviceId: e-auth
+      stripPrefix: false
+
+    e-operation:
+      path: /operation/**
+      serviceId: e-operation
+      stripPrefix: false
+
+#    hello:
+#      path: /hello/**
 #      serviceId: HelloService
-      url: http://example.com/hello
-      stripPrefix: true
+#      url: http://example.com/hello
+#      stripPrefix: true
 
 eureka:
   client:

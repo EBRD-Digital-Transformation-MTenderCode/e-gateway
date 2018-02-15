@@ -6,9 +6,11 @@ import com.auth0.jwt.exceptions.TokenExpiredException
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.http.HttpServletRequestWrapper
+import com.procurement.gateway.MDCKey
 import com.procurement.gateway.configuration.properties.RSAFilterProperties
 import com.procurement.gateway.exception.InvalidAuthorizationHeaderTypeException
 import com.procurement.gateway.exception.NoSuchAuthorizationHeaderException
+import com.procurement.gateway.mdc
 import com.procurement.gateway.security.JWTService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -42,38 +44,44 @@ class RSAFilter(private val RSAFilterProperties: RSAFilterProperties, private va
             validateToken(context)
         } catch (ex: Exception) {
             val request = context.request as HttpServletRequestWrapper
-            when (ex) {
-                is NoSuchAuthorizationHeaderException -> {
-                    context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                    context.response.addHeader(WWW_AUTHENTICATE, REALM)
-                    log.debug("No access token.", ex)
-                }
-                is InvalidAuthorizationHeaderTypeException -> {
-                    context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                    context.response.addHeader(WWW_AUTHENTICATE, REALM)
-                    log.debug("Invalid type of token.", ex)
-                }
-                is TokenExpiredException -> {
-                    context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                    context.response.addHeader(
-                        WWW_AUTHENTICATE,
-                        "$REALM, error_code=\"invalid_token\", error_message=\"The access token expired.\""
-                    )
-                    log.debug("The access token expired.", ex)
-                }
-                is SignatureVerificationException -> {
-                    context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                    context.response.addHeader(WWW_AUTHENTICATE, REALM)
-                    log.error("Invalid signature of a tokin.\n${request.getRequestInfo()}", ex)
-                }
-                is JWTVerificationException -> {
-                    context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                    context.response.addHeader(WWW_AUTHENTICATE, REALM)
-                    log.error("Error of verify token.\n${request.getRequestInfo()}", ex)
-                }
-                else -> {
-                    context.responseStatusCode = HttpStatus.INTERNAL_SERVER_ERROR.value()
-                    log.error("Error of validate token.\n${request.getRequestInfo()}", ex)
+            val uri = request.requestURI + (request.queryString?.let { "?" + it } ?: "")
+            mdc(MDCKey.REMOTE_ADDRESS to request.remoteAddr,
+                MDCKey.HTTP_METHOD to request.method,
+                MDCKey.REQUEST_URI to uri
+            ) {
+                when (ex) {
+                    is NoSuchAuthorizationHeaderException -> {
+                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
+                        context.response.addHeader(WWW_AUTHENTICATE, REALM)
+                        log.warn("No access token.")
+                    }
+                    is InvalidAuthorizationHeaderTypeException -> {
+                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
+                        context.response.addHeader(WWW_AUTHENTICATE, REALM)
+                        log.warn("Invalid type of token.")
+                    }
+                    is TokenExpiredException -> {
+                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
+                        context.response.addHeader(
+                            WWW_AUTHENTICATE,
+                            "$REALM, error_code=\"invalid_token\", error_message=\"The access token expired.\""
+                        )
+                        log.warn("The access token expired.")
+                    }
+                    is SignatureVerificationException -> {
+                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
+                        context.response.addHeader(WWW_AUTHENTICATE, REALM)
+                        log.warn("Invalid signature of a token.")
+                    }
+                    is JWTVerificationException -> {
+                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
+                        context.response.addHeader(WWW_AUTHENTICATE, REALM)
+                        log.warn("Error of verify token.")
+                    }
+                    else -> {
+                        context.responseStatusCode = HttpStatus.INTERNAL_SERVER_ERROR.value()
+                        log.warn("Error of validate token.")
+                    }
                 }
             }
             context.setSendZuulResponse(false)
@@ -98,15 +106,5 @@ class RSAFilter(private val RSAFilterProperties: RSAFilterProperties, private va
             throw InvalidAuthorizationHeaderTypeException()
 
     private fun RequestContext.getAuthorizationHeader(): String? = this.request.getHeader(AUTHORIZATION_HEADER)
-
-    private fun HttpServletRequestWrapper.getRequestInfo(): String {
-        val contentType = this.contentType?.let { "\nContent-Type: $it" } ?: ""
-        val content = this.contentData?.let { "\n" + String(it) } ?: ""
-        return "Remote address: ${this.remoteAddr}\n" +
-            "${this.protocol}\n" +
-            "${this.method} ${this.requestURI}?${this.queryString}" +
-            contentType +
-            content
-    }
 }
 

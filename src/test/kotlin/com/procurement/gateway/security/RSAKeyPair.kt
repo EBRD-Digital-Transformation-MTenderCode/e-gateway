@@ -1,4 +1,4 @@
-package com.procurement.gateway.model.rsa
+package com.procurement.gateway.security
 
 /**
  * Container for storing the string representation of private and public keys.

@@ -14,32 +14,51 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.0.M7</version>
+        <version>2.0.2.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
+        <!--Project-->
         <final-artifact-name>${project.artifactId}-${project.version}</final-artifact-name>
-        <docker-registry>docker-registry.eprocurement.systems</docker-registry>
         <project.service.port>8080</project.service.port>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <kotlin.version>1.2.10</kotlin.version>
+        <!--Kotlin-->
+        <kotlin.version>1.2.70</kotlin.version>
+        <kotlin-coroutines.version>0.24.0</kotlin-coroutines.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
 
+        <!--Docker-->
+        <docker-registry>dev.docker-registry.eprocurement.systems</docker-registry>
         <docker-image-profile></docker-image-profile>
-        <docker-maven-plugin.version>0.23.0</docker-maven-plugin.version>
-        <java-jwt.version>3.2.0</java-jwt.version>
-        <junit-jupiter.version>5.0.0</junit-jupiter.version>
-        <junit-platform.version>1.0.0</junit-platform.version>
+        <docker-maven-plugin.version>0.24.0</docker-maven-plugin.version>
+
+        <!--Spring-->
+        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
+        <spring-restdocs-asciidoctor.version>2.0.1.RELEASE</spring-restdocs-asciidoctor.version>
+
+        <!--Loggin-->
         <logstash.logback.encoder.version>4.11</logstash.logback.encoder.version>
+
+        <!--Libs-->
+        <jetbrains-annotations.version>16.0.1</jetbrains-annotations.version>
+
+        <!--Test-->
+        <junit-jupiter.version>5.2.0</junit-jupiter.version>
+        <junit-platform.version>1.2.0</junit-platform.version>
+        <mockito.version>2.18.3</mockito.version>
+        <mockito-kotlin.version>1.5.0</mockito-kotlin.version>
+        <testcontainers.version>1.6.0</testcontainers.version>
+
+        <!--Plugins-->
+        <asciidoctor-maven-plugin.version>1.5.6</asciidoctor-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
         <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>2.19</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>2.19</maven-failsafe-plugin.version>
-        <mockito.version>1.10.19</mockito.version>
-        <spring-cloud.version>Finchley.M5</spring-cloud.version>
+        <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>2.21.0</maven-failsafe-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -68,6 +87,10 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
 
         <!--Spring Boot-->
         <dependency>
@@ -79,7 +102,7 @@
         <!--Kotlin-->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jre8</artifactId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -90,18 +113,21 @@
             <artifactId>kotlin-annotation-processing-maven</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-jdk8</artifactId>
+            <version>${kotlin-coroutines.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-reactor</artifactId>
+            <version>${kotlin-coroutines.version}</version>
+        </dependency>
 
         <!--Jackson-->
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
-        </dependency>
-
-        <!--JWT-->
-        <dependency>
-            <groupId>com.auth0</groupId>
-            <artifactId>java-jwt</artifactId>
-            <version>${java-jwt.version}</version>
         </dependency>
 
         <!--Logging-->
@@ -169,8 +195,15 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nhaarman</groupId>
+            <artifactId>mockito-kotlin</artifactId>
+            <version>${mockito-kotlin.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -190,33 +223,16 @@
         </resources>
 
         <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>${junit-platform.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter-engine</artifactId>
-                        <version>${junit-jupiter.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-
+            <!--Kotlin compiler-->
             <plugin>
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <version>${kotlin.version}</version>
                 <configuration>
+                    <args>
+                        <arg>-Xjsr305=strict</arg>
+                        <arg>-Xcoroutines=enable</arg>
+                    </args>
                     <jvmTarget>1.8</jvmTarget>
                     <compilerPlugins>
                         <plugin>spring</plugin>
@@ -269,12 +285,31 @@
                 </executions>
             </plugin>
 
+            <!--Spring Boot-->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
+            <!--Unit Test (Surefire)-->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>${junit-platform.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                        <version>${junit-jupiter.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!--Build Docker Image (fabric8)-->
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
@@ -283,7 +318,8 @@
                     <images>
                         <image>
                             <registry>${docker-registry}</registry>
-                            <name>${docker-registry}/${project.artifactId}${docker-image-profile}:${project.version}</name>
+                            <name>${docker-registry}/${project.artifactId}${docker-image-profile}:${project.version}
+                            </name>
                             <build>
                                 <dockerFileDir>${project.basedir}/src/main</dockerFileDir>
                                 <nocache/>

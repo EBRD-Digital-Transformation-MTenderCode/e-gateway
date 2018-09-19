@@ -1,29 +1,28 @@
 package com.procurement.gateway.filter
 
-import com.auth0.jwt.exceptions.JWTVerificationException
-import com.auth0.jwt.exceptions.SignatureVerificationException
-import com.auth0.jwt.exceptions.TokenExpiredException
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.context.RequestContext
 import com.netflix.zuul.http.HttpServletRequestWrapper
 import com.procurement.gateway.MDCKey
 import com.procurement.gateway.configuration.properties.RSAFilterProperties
-import com.procurement.gateway.exception.InvalidAuthorizationHeaderTypeException
-import com.procurement.gateway.exception.NoSuchAuthorizationHeaderException
+import com.procurement.gateway.exception.client.RemoteServiceException
 import com.procurement.gateway.mdc
-import com.procurement.gateway.security.JWTService
+import com.procurement.gateway.service.AuthClient
+import kotlinx.coroutines.experimental.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE
 import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Component
 
-class RSAFilter(private val RSAFilterProperties: RSAFilterProperties, private val jwtService: JWTService) : ZuulFilter() {
+@Component
+class RSAFilter(
+    private val RSAFilterProperties: RSAFilterProperties,
+    private val authClient: AuthClient) : ZuulFilter() {
+
     companion object {
         const val AUTHORIZATION_HEADER = "Authorization"
-        const val AUTHORIZATION_PREFIX_BEARER = "Bearer "
-        const val WWW_AUTHENTICATE = "WWW-Authenticate"
-        const val REALM = "Bearer realm=\"yoda\""
 
         val log: Logger = LoggerFactory.getLogger(RSAFilter::class.java)
     }
@@ -41,42 +40,19 @@ class RSAFilter(private val RSAFilterProperties: RSAFilterProperties, private va
     override fun run(): Any? {
         val context = RequestContext.getCurrentContext()
         try {
-            validateToken(context)
+            context.verificationAccessToken()
         } catch (ex: Exception) {
             val request = context.request as HttpServletRequestWrapper
-            val uri = request.requestURI + (request.queryString?.let { "?" + it } ?: "")
-            mdc(MDCKey.REMOTE_ADDRESS to request.remoteAddr,
+            val uri = request.requestURI + (request.queryString?.let { "?$it" } ?: "")
+            mdc(
+                MDCKey.REMOTE_ADDRESS to request.remoteAddr,
                 MDCKey.HTTP_METHOD to request.method,
-                MDCKey.REQUEST_URI to uri
-            ) {
+                MDCKey.REQUEST_URI to uri) {
+
                 when (ex) {
-                    is NoSuchAuthorizationHeaderException -> {
-                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                        context.response.addHeader(WWW_AUTHENTICATE, REALM)
-                        log.warn("No access token.")
-                    }
-                    is InvalidAuthorizationHeaderTypeException -> {
-                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                        context.response.addHeader(WWW_AUTHENTICATE, REALM)
-                        log.warn("Invalid type of token.")
-                    }
-                    is TokenExpiredException -> {
-                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                        context.response.addHeader(
-                            WWW_AUTHENTICATE,
-                            "$REALM, error_code=\"invalid_token\", error_message=\"The access token expired.\""
-                        )
-                        log.warn("The access token expired.")
-                    }
-                    is SignatureVerificationException -> {
-                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                        context.response.addHeader(WWW_AUTHENTICATE, REALM)
-                        log.warn("Invalid signature of a token.")
-                    }
-                    is JWTVerificationException -> {
-                        context.responseStatusCode = HttpStatus.UNAUTHORIZED.value()
-                        context.response.addHeader(WWW_AUTHENTICATE, REALM)
-                        log.warn("Error of verify token.")
+                    is RemoteServiceException -> {
+                        context.responseStatusCode = ex.code.value()
+                        context.responseBody = ex.payload
                     }
                     else -> {
                         context.responseStatusCode = HttpStatus.INTERNAL_SERVER_ERROR.value()
@@ -89,22 +65,9 @@ class RSAFilter(private val RSAFilterProperties: RSAFilterProperties, private va
         return null
     }
 
-    fun validateToken(context: RequestContext) {
-        val token = context.getToken()
-        jwtService.verify(token)
+    fun RequestContext.verificationAccessToken() {
+        val token = this.request.getHeader(AUTHORIZATION_HEADER)
+        runBlocking { authClient.verification(token) }
     }
-
-    private fun RequestContext.getToken(): String {
-        getAuthorizationHeader()?.let { return getAuthorizationToken(it) }
-        throw NoSuchAuthorizationHeaderException()
-    }
-
-    private fun getAuthorizationToken(header: String): String =
-        if (header.startsWith(AUTHORIZATION_PREFIX_BEARER))
-            header.substring(AUTHORIZATION_PREFIX_BEARER.length)
-        else
-            throw InvalidAuthorizationHeaderTypeException()
-
-    private fun RequestContext.getAuthorizationHeader(): String? = this.request.getHeader(AUTHORIZATION_HEADER)
 }
 

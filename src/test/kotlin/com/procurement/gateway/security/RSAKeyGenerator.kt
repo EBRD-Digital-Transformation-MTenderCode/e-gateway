@@ -1,6 +1,5 @@
 package com.procurement.gateway.security
 
-import com.procurement.gateway.model.rsa.RSAKeyPair
 import org.apache.commons.codec.binary.Base64
 import java.security.*
 import java.security.spec.InvalidKeySpecException
@@ -15,12 +14,12 @@ class RSAKeyGenerator {
         val privateKey = keyPair.private
         val publicKey = keyPair.public
         return RSAKeyPair(
-            BEGIN_PRIVATE_KEY + NEW_LINE_PATTERN +
-                Base64.encodeBase64String(privateKey.encoded) +
-                NEW_LINE_PATTERN + END_PRIVATE_KEY,
-            BEGIN_PUBLIC_KEY + NEW_LINE_PATTERN +
-                Base64.encodeBase64String(publicKey.encoded) +
-                NEW_LINE_PATTERN + END_PUBLIC_KEY
+                BEGIN_PRIVATE_KEY + NEW_LINE_PATTERN +
+                        Base64.encodeBase64String(privateKey.encoded) +
+                        NEW_LINE_PATTERN + END_PRIVATE_KEY,
+                BEGIN_PUBLIC_KEY + NEW_LINE_PATTERN +
+                        Base64.encodeBase64String(publicKey.encoded) +
+                        NEW_LINE_PATTERN + END_PUBLIC_KEY
         )
     }
 

@@ -10,7 +10,7 @@ docker network create \
 
 
 #****************************************#
-# Run E-Gateway                          #
+# Run Gateway                            #
 # Need assign uri, username and password #
 #****************************************#
 
@@ -21,4 +21,4 @@ docker run -d --name=gateway-1 \
   --publish 8900:8080 \
   --network ocds-network \
   --dns 10.0.10.115 \
-  docker-registry.eprocurement.systems/e-gateway:17.12.1
+  docker-registry.eprocurement.systems/gateway:17.12.1

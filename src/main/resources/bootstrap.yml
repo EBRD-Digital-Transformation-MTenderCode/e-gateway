@@ -3,9 +3,9 @@ server:
 
 spring:
   application:
-    name: e-gateway
+    name: gateway
 
   cloud:
     config:
       failFast: true
-      name: e-gateway
+      name: gateway

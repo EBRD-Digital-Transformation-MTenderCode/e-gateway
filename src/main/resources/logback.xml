@@ -6,9 +6,9 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/e-gateway.log</file>
+        <file>logs/gateway.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/e-gateway%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>logs/gateway%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>5MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -22,7 +22,7 @@
                     <fieldName>level</fieldName>
                 </logLevel>
                 <pattern>
-                    <pattern>{"appName": "e-gateway", "appVersion": "17.12.1"}</pattern>
+                    <pattern>{"appName": "gateway", "appVersion": "17.12.1"}</pattern>
                 </pattern>
                 <version/> <!-- Logstash json format version, the @version field in the output-->
                 <loggerName/>
@@ -45,7 +45,7 @@
                     <fieldName>level</fieldName>
                 </logLevel>
                 <pattern>
-                    <pattern>{"appName": "e-gateway", "appVersion": "17.12.1"}</pattern>
+                    <pattern>{"appName": "gateway", "appVersion": "17.12.1"}</pattern>
                 </pattern>
                 <version/> <!-- Logstash json format version, the @version field in the output-->
                 <loggerName/>

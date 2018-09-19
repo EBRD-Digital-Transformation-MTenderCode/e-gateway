@@ -22,4 +22,4 @@ docker service create --name="gateway-1" \
   --network ocds-network \
   --dns 10.0.10.115 \
   --with-registry-auth \
-  docker-registry.eprocurement.systems/e-gateway:17.12.1
+  docker-registry.eprocurement.systems/gateway:17.12.1

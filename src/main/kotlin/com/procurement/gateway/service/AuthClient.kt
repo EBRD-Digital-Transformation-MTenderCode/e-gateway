@@ -20,7 +20,6 @@ class AuthClientImpl(private val webClientBuilder: WebClient.Builder) : AuthClie
             .toUriString()
     }
 
-
     override suspend fun verification(token: String?) {
         webClientBuilder.execute<String>(AUTH_URI, token ?: "") { it.awaitFirst() }
     }

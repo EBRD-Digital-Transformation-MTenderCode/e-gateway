@@ -14,12 +14,12 @@ docker network create \
 # Need assign uri, username and password #
 #****************************************#
 
-docker service create --name="gateway-1" \
-  --env __PROP_spring_cloud_config_uri=http://config-server-1:8700 \
+docker service create --name="gateway" \
+  --env __PROP_spring_cloud_config_uri=http://config-server:8700 \
   --env __PROP_spring_profiles_active=default \
   --env __PROP_spring_cloud_config_label= \
   --publish published=8900,target=8080 \
   --network ocds-network \
-  --dns 10.0.10.115 \
+  --dns 10.0.20.115 \
   --with-registry-auth \
-  docker-registry.eprocurement.systems/gateway:17.12.1
+  dev.docker-registry.eprocurement.systems/gateway:17.12.1

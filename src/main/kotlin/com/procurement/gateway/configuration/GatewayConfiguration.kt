@@ -2,7 +2,6 @@ package com.procurement.gateway.configuration
 
 import com.procurement.gateway.configuration.properties.RSAFilterProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.cloud.client.loadbalancer.LoadBalanced
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
@@ -13,6 +12,5 @@ import org.springframework.web.reactive.function.client.WebClient
 @EnableConfigurationProperties(value = [RSAFilterProperties::class])
 class GatewayConfiguration {
     @Bean
-    @LoadBalanced
     fun loadBalancedWebClientBuilder(): WebClient.Builder = WebClient.builder()
 }

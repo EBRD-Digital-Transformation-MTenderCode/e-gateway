@@ -56,7 +56,7 @@ class RSAFilter(
                     }
                     else -> {
                         context.responseStatusCode = HttpStatus.INTERNAL_SERVER_ERROR.value()
-                        log.warn("Error of validate token.")
+                        log.warn("Error of validate token.", ex)
                     }
                 }
             }

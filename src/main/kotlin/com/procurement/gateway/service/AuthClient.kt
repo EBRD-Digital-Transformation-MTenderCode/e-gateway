@@ -14,7 +14,7 @@ interface AuthClient {
 @Service
 class AuthClientImpl(private val webClientBuilder: WebClient.Builder) : AuthClient {
     companion object {
-        val AUTH_URI: String = UriComponentsBuilder.fromHttpUrl("http://E-AUTH")
+        val AUTH_URI: String = UriComponentsBuilder.fromHttpUrl("http://auth:8080")
             .pathSegment("auth")
             .pathSegment("verification")
             .toUriString()

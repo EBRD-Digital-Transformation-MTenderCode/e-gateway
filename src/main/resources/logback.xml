@@ -62,11 +62,13 @@
     <logger name="com.procurement.gateway" level="WARN" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="STDOUT"/>
     </logger>
 
     <logger name="org.springframework" level="WARN" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="STDOUT"/>
     </logger>
 
     <root level="INFO">

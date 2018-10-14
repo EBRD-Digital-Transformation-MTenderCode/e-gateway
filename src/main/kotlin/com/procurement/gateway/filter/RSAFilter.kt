@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 
 @Component
@@ -51,10 +52,12 @@ class RSAFilter(
 
                 when (ex) {
                     is RemoteServiceException -> {
+                        context.response.contentType = MediaType.APPLICATION_JSON_UTF8_VALUE
                         context.responseStatusCode = ex.code.value()
                         context.responseBody = ex.payload
                     }
                     else -> {
+                        context.response.contentType = MediaType.APPLICATION_JSON_UTF8_VALUE
                         context.responseStatusCode = HttpStatus.INTERNAL_SERVER_ERROR.value()
                         log.warn("Error of validate token.", ex)
                     }

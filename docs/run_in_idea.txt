@@ -1,0 +1,4 @@
+-Dspring.config.location=file:"path to file 'application-dev.yml'"
+
+example
+-Dspring.config.location=file:/path/to/application-dev.yml
